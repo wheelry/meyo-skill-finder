@@ -9,16 +9,22 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
 from pathlib import Path
 
+# Windows 控制台默认 cp936，中文/emoji 会 UnicodeEncodeError，统一切到 UTF-8
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 def _read_json(path: Path) -> dict:
     try:
         if path.exists():
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
     except (json.JSONDecodeError, OSError):
         pass
@@ -215,8 +221,8 @@ def main():
     }
 
     # 保存结果（供 install 脚本读取 requestId 串联下载链路）
-    output_path = args.output or "/tmp/meyo_search_results.json"
-    with open(output_path, "w") as f:
+    output_path = args.output or str(Path(tempfile.gettempdir()) / "meyo_search_results.json")
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
     # 同时输出到 stdout

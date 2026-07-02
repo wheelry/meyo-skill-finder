@@ -11,6 +11,7 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -19,6 +20,11 @@ import uuid
 import zipfile
 from io import BytesIO
 from pathlib import Path
+
+# Windows 控制台默认 cp936，中文/emoji 会 UnicodeEncodeError，统一切到 UTF-8
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 # 项目 skills/ 目录（内置 skill 来源）
 _PROJECT_SKILLS_DIR = Path(__file__).resolve().parent.parent.parent
@@ -48,7 +54,7 @@ def _is_builtin_skill(skill_name: str) -> bool:
 def _read_json(path: Path) -> dict:
     try:
         if path.exists():
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
     except (json.JSONDecodeError, OSError):
         pass
@@ -178,7 +184,7 @@ def write_origin_metadata(skill_dir: Path, skill_name: str, metadata: dict):
         "sourceUrl": metadata.get("sourceUrl", ""),
         "installedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
-    with open(origin_dir / "origin.json", "w") as f:
+    with open(origin_dir / "origin.json", "w", encoding="utf-8") as f:
         json.dump(origin, f, ensure_ascii=False, indent=2)
 
 
@@ -219,7 +225,7 @@ def download_skill_zip(name: str, version: str = None, request_id: str = None) -
 def _load_last_search_request_id() -> str:
     """从 meyo_skill_search.py 输出的搜索结果文件中读取 requestId，用于串联下载链路。"""
     try:
-        p = Path("/tmp/meyo_search_results.json")
+        p = Path(tempfile.gettempdir()) / "meyo_search_results.json"
         if p.exists():
             data = json.loads(p.read_text(encoding="utf-8"))
             return data.get("requestId", "") or ""
@@ -352,7 +358,7 @@ def list_installed(target_dir: Path):
             source = "local"
             if origin_file.exists():
                 try:
-                    with open(origin_file) as f:
+                    with open(origin_file, encoding="utf-8") as f:
                         origin = json.load(f)
                         source = origin.get("registry", "unknown")
                 except (json.JSONDecodeError, OSError):
