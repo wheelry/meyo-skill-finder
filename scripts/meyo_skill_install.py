@@ -199,7 +199,7 @@ def _get_version(metadata: dict) -> str:
     return "unknown"
 
 
-def download_skill_zip(name: str, version: str = None, request_id: str = None) -> bytes:
+def download_skill_zip(name: str, version: str = None, request_id: str = None, agent_type: str = None) -> bytes:
     """从 /skills/download/public 下载 zip 包，返回 bytes。
 
     request_id 用于串联 search → download 链路，未显式传入时自动从最近一次搜索结果文件读取。
@@ -207,14 +207,16 @@ def download_skill_zip(name: str, version: str = None, request_id: str = None) -
     if not request_id:
         request_id = _load_last_search_request_id()
 
-    params = f"name={urllib.parse.quote(name)}"
+    params = {"name": name, "ref": "github"}
     if version:
-        params += f"&version={urllib.parse.quote(version)}"
+        params["version"] = version
     if request_id:
-        params += f"&requestId={urllib.parse.quote(request_id)}"
+        params["requestId"] = request_id
+    if agent_type:
+        params["agentType"] = agent_type
 
     api_url = get_api_url()
-    url = f"{api_url}/skills/download/public?{params}"
+    url = f"{api_url}/skills/download/public?{urllib.parse.urlencode(params)}"
     headers = _auth_headers()
 
     req = urllib.request.Request(url, headers=headers)
@@ -264,7 +266,7 @@ def install_from_zip(data: bytes, skill_name: str, target_dir: Path) -> bool:
         return False
 
 
-def install_skill(skill_name: str, target_dir: Path) -> bool:
+def install_skill(skill_name: str, target_dir: Path, agent_type: str = None) -> bool:
     """安装 skill 主流程。target_dir 为当前 Agent 的 skills 目录。"""
     # 内置 skill 不允许通过脚本覆盖
     if _is_builtin_skill(skill_name):
@@ -286,7 +288,7 @@ def install_skill(skill_name: str, target_dir: Path) -> bool:
     # 下载 zip 包（包含完整文件如 scripts/）；非 zip 则当作单文件 SKILL.md
     try:
         print(f"  下载 zip 包 (version={version})...", file=sys.stderr)
-        data = download_skill_zip(skill_name, version if version != "unknown" else None)
+        data = download_skill_zip(skill_name, version if version != "unknown" else None, agent_type=agent_type)
         if data[:4] == b'PK\x03\x04':
             success = install_from_zip(data, skill_name, target_dir)
         else:
@@ -378,6 +380,7 @@ def main():
     parser = argparse.ArgumentParser(description="安装 Meyo 社区 Skill")
     parser.add_argument("skill_name", nargs="?", help="Skill 名称/slug")
     parser.add_argument("--dir", required=True, help="当前 Agent 的 skills 目录")
+    parser.add_argument("--agent-type", default=None, help="当前 Agent 类型（如 openclaw/hermes/qclaw/catdesk 等，可选）")
     parser.add_argument("--uninstall", action="store_true", help="卸载 skill")
     parser.add_argument("--list", action="store_true", help="列出已安装")
     args = parser.parse_args()
@@ -390,11 +393,11 @@ def main():
         if args.uninstall:
             uninstall_skill(args.skill_name, target_dir)
         else:
-            install_skill(args.skill_name, target_dir)
+            install_skill(args.skill_name, target_dir, agent_type=args.agent_type)
     else:
         parser.print_help()
         print("\n示例:")
-        print("  meyo_skill_install.py hv-analysis --dir ~/.claude/skills")
+        print("  meyo_skill_install.py hv-analysis --dir ~/.claude/skills --agent-type openclaw")
         print("  meyo_skill_install.py hv-analysis --dir ~/.claude/skills --uninstall")
         print("  meyo_skill_install.py --dir ~/.claude/skills --list")
 

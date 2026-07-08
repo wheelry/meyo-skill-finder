@@ -1,7 +1,7 @@
 ---
 name: meyo-skill-finder
 description: "从 Meyo 社区搜索并安装最适合用户任务的 skill。支持语义搜索，按相关性排序推荐。触发条件: 当用户说“找个 xxx 技能”“推荐一个做内容创作的 skill”“有没有制作PPT 的 skill”“Meyo上搜一下 xxx 这个skill”“股票投资类有哪些技能”“找一找有没有现成的技能”等，需要使用本技能检索并推荐 Skill。"
-version: "1.0.6"
+version: "1.1.0"
 metadata:
   emoji: "🔍"
   requires:
@@ -15,10 +15,10 @@ metadata:
 ### Step 1: Skill检索：按照用户任务描述，发起检索
 先判断用户输入是否包含明确的 skill 需求：如果描述太模糊（如只说"找个skill""推荐个技能"），先检查对话上下文中是否有可推断的需求，如有则基于上下文发起检索；如无则追问用户想找什么方向的 skill，拿到具体描述后再检索。
 
-拿到具体需求后，直接将用户的任务描述作为请求，调用如下接口，脚本会使用觅游社区的 Skill 检索服务进行意图理解、搜索召回并按相关性排序，最终输出5个以内的推荐skill。
+拿到具体需求后，先按下方「Agent 类型识别」识别当前 Agent 类型，再将用户的任务描述作为请求，调用如下接口，脚本会使用觅游社区的 Skill 检索服务进行意图理解、搜索召回并按相关性排序，最终输出5个以内的推荐skill。
 
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_search.py "<用户任务描述>"
+{python} {skill_dir}/scripts/meyo_skill_search.py "<用户任务描述>" --agent-type <你的Agent类型>
 ```
 
 > `{python}` 需按本机实际选择：macOS/Linux 通常为 `python3`，Windows 通常为 `python` 或 `py`。下同。
@@ -61,7 +61,7 @@ metadata:
 确认用户选择后，进行本地检查：检查 `{skills_dir}/{name}/SKILL.md` 是否存在（`{skills_dir}` 为当前 Agent 的 skills 目录，`{name}` 为用户选择的 skill 名称）。若存在则视为已安装，告知用户"该 skill 已安装，无需重复安装，是否直接运行？"；若不存在，则执行安装流程：
 
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_install.py <name> --dir <当前 Agent 的 skills 目录>
+{python} {skill_dir}/scripts/meyo_skill_install.py <name> --dir <当前 Agent 的 skills 目录> --agent-type <你的Agent类型>
 ```
 
 安装脚本执行后，根据退出状态输出结果：
@@ -77,6 +77,16 @@ metadata:
 | `meyo_skill_search.py` | 根据用户任务检索skill |
 | `meyo_skill_install.py` | 下载安装 skill |
 
+## Agent 类型识别（agent_type）
+
+为了得到更精准的搜索结果，调用搜索/下载脚本时需要上传当前 Agent 类型信息（`agent_type`）。请按以下方式识别你当前的 Agent 类型：
+
+1. **从 system prompt 识别**：若你的运行环境提供 system prompt（如 Catdesk、Hermes 等），从中识别 Agent 框架名称
+2. **从 IDENTITY.md 识别**：若运行环境无 system prompt（如 Qclaw 等），检查本地是否存在 `IDENTITY.md`，从中读取 Agent 框架标识
+3. **自行判断**：若以上均无法识别，根据你所在的运行时框架自行判断
+
+识别后，调用脚本时通过 `--agent-type <类型>` 参数传入。若确实无法识别，可省略该参数，脚本会正常执行但不带 agent_type 上报。
+
 ## 注意事项
 
 1. **本地优先**: 需要确认本地是否已经安装该skill ，避免重复下载
@@ -90,7 +100,7 @@ metadata:
 
 **Agent 执行**：
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_search.py "写小红书爆款帖子"
+{python} {skill_dir}/scripts/meyo_skill_search.py "写小红书爆款帖子" --agent-type openclaw
 ```
 
 **Agent 输出**：
@@ -110,7 +120,7 @@ metadata:
 
 **Agent 执行**：
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_install.py qf-xiaohongshu-writer --dir ~/.catpaw/skills
+{python} {skill_dir}/scripts/meyo_skill_install.py qf-xiaohongshu-writer --dir ~/.catpaw/skills --agent-type openclaw
 ```
 
 **Agent 输出**：

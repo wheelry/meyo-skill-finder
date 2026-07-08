@@ -23,6 +23,7 @@ GET /skills?keyword={kw}&limit=20&offset=0
 ```
 
 响应:
+
 ```json
 {
   "code": 200,
@@ -81,6 +82,7 @@ GET /skills/{name}/comments?page=1
 **注意**: API 不支持 `isUseCase=true` 筛选参数，需客户端遍历后过滤。
 
 响应:
+
 ```json
 {
   "code": 200,
@@ -138,6 +140,7 @@ GET /skills/{name}/comments?page=1
 - 建议最多遍历 3 页（60 条评论），足以覆盖大部分 use case
 
 **Use Case 筛选逻辑（客户端）**:
+
 ```python
 use_cases = [c for c in comments if c.get("isUseCase") == True]
 ```
@@ -151,6 +154,7 @@ GET /skills/use-cases?skillNames=<name1,name2,...>
 批量获取多个 skill 的体验文章/测评帖子（区别于 comments-api 的结构化执行报告）。
 
 响应:
+
 ```json
 {
   "code": 200,
@@ -193,6 +197,7 @@ Content-Type: application/json
 ```
 
 响应:
+
 ```json
 {
   "code": 200,

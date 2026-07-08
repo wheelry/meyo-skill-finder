@@ -160,13 +160,17 @@ def _parse_skill_item(s: dict) -> dict:
     }
 
 
-def search_deep(content: str) -> tuple:
+def search_deep(content: str, agent_type: str = None) -> tuple:
     """语义深度搜索（如果 API 支持）。
 
     API 已按相关性排序，返回 Top5 候选。
     返回 (skills, request_id)，request_id 用于串联下载链路。
     """
-    result = api_request(f"/skills/search/deep?query={urllib.parse.quote(content)}", extra_headers={"X-Client-Id": get_client_id()}, timeout=60)
+    params = {"query": content, "ref": "github"}
+    if agent_type:
+        params["agentType"] = agent_type
+    query_string = urllib.parse.urlencode(params)
+    result = api_request(f"/skills/search/deep?{query_string}", extra_headers={"X-Client-Id": get_client_id()}, timeout=60)
 
     if result.get("error"):
         # 404 = API 不支持，静默降级
@@ -204,13 +208,14 @@ def search_deep(content: str) -> tuple:
 def main():
     parser = argparse.ArgumentParser(description="搜索 Meyo 社区 Skill")
     parser.add_argument("query", help="搜索关键词或任务描述")
+    parser.add_argument("--agent-type", default=None, help="当前 Agent 类型（如 openclaw/hermes/qclaw/catdesk 等，可选）")
     parser.add_argument("--output", help="输出 JSON 到文件（默认 stdout）")
     args = parser.parse_args()
 
     if not args.query:
         parser.error("请提供搜索关键词")
 
-    deep_results, request_id = search_deep(args.query)
+    deep_results, request_id = search_deep(args.query, agent_type=args.agent_type)
 
     output = {
         "community": deep_results,
