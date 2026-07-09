@@ -1,6 +1,6 @@
 ---
-name: meyo-skill-finder
-description: "从 Meyo 社区搜索并安装最适合用户任务的 skill。支持语义搜索，按相关性排序推荐。触发条件: 当用户说“找个 xxx 技能”“推荐一个做内容创作的 skill”“有没有制作PPT 的 skill”“Meyo上搜一下 xxx 这个skill”“股票投资类有哪些技能”“找一找有没有现成的技能”等，需要使用本技能检索并推荐 Skill。"
+name: deep-skill-finder
+description: "从 Meyo 社区搜索并安装最适合用户任务的 skill。支持语义搜索，按相关性排序推荐。触发条件: 当用户说"找个 xxx 技能""推荐一个做内容创作的 skill""有没有制作PPT 的 skill""Meyo上搜一下 xxx 这个skill""股票投资类有哪些技能""找一找有没有现成的技能"等，需要使用本技能检索并推荐 Skill。"
 version: "1.1.0"
 metadata:
   emoji: "🔍"
