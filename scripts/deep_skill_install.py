@@ -2,9 +2,9 @@
 """从 Meyo 社区安装 Skill。
 
 用法:
-  meyo_skill_install.py <skill-name> --dir <当前 Agent 的 skills 目录>   # 安装
-  meyo_skill_install.py <skill-name> --dir <dir> --uninstall             # 卸载
-  meyo_skill_install.py --dir <dir> --list                               # 列出已安装
+  deep_skill_install.py <skill-name> --dir <当前 Agent 的 skills 目录>   # 安装
+  deep_skill_install.py <skill-name> --dir <dir> --uninstall             # 卸载
+  deep_skill_install.py --dir <dir> --list                               # 列出已安装
 """
 
 import argparse
@@ -29,11 +29,11 @@ if hasattr(sys.stdout, "reconfigure"):
 # 项目 skills/ 目录（内置 skill 来源）
 _PROJECT_SKILLS_DIR = Path(__file__).resolve().parent.parent.parent
 
-CLIENT_ID_FILE = Path.home() / ".meyo_skill_finder" / "client_id"
+CLIENT_ID_FILE = Path.home() / ".deep_skill_finder" / "client_id"
 
 
 def get_client_id() -> str:
-    """返回本机持久化的 clientId，不存在则生成并写入 ~/.meyo_skill_finder/client_id。"""
+    """返回本机持久化的 clientId，不存在则生成并写入 ~/.deep_skill_finder/client_id。"""
     try:
         if CLIENT_ID_FILE.exists():
             cid = CLIENT_ID_FILE.read_text(encoding="utf-8").strip()
@@ -77,14 +77,14 @@ def get_api_url_candidates():
         candidates.append(configured.rstrip("/"))
 
     if not candidates:
-        candidates = ["https://www.meyo123.com/api/v1"]
+        candidates = ["https://www.meyo.life/api/v1"]
 
     return candidates
 
 
 def _probe_api_url(url: str, token: str) -> bool:
     """探测 API URL 是否可认证（GET /skills，不返回 401 即可）。"""
-    headers = {"User-Agent": "meyo-skill-finder/1.0"}
+    headers = {"User-Agent": "deep-skill-finder/1.0"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     try:
@@ -130,7 +130,7 @@ def api_request(endpoint: str, method: str = "GET", data: dict = None) -> dict:
     url = f"{api_url}/{endpoint.lstrip('/')}"
     token = get_api_token()
 
-    headers = {"User-Agent": "meyo-skill-finder/1.0"}
+    headers = {"User-Agent": "deep-skill-finder/1.0"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
@@ -163,7 +163,7 @@ def get_skill_metadata(skill_name: str) -> dict:
 def _auth_headers() -> dict:
     """构造下载请求的通用 headers（含 clientId）。"""
     token = get_api_token()
-    headers = {"User-Agent": "meyo-skill-finder/1.0"}
+    headers = {"User-Agent": "deep-skill-finder/1.0"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     client_id = get_client_id()
@@ -207,7 +207,7 @@ def download_skill_zip(name: str, version: str = None, request_id: str = None, a
     if not request_id:
         request_id = _load_last_search_request_id()
 
-    params = {"name": name, "ref": "github"}
+    params = {"name": name, "ref": "meyo"}
     if version:
         params["version"] = version
     if request_id:
@@ -225,9 +225,9 @@ def download_skill_zip(name: str, version: str = None, request_id: str = None, a
 
 
 def _load_last_search_request_id() -> str:
-    """从 meyo_skill_search.py 输出的搜索结果文件中读取 requestId，用于串联下载链路。"""
+    """从 deep_skill_search.py 输出的搜索结果文件中读取 requestId，用于串联下载链路。"""
     try:
-        p = Path(tempfile.gettempdir()) / "meyo_search_results.json"
+        p = Path(tempfile.gettempdir()) / "deep_search_results.json"
         if p.exists():
             data = json.loads(p.read_text(encoding="utf-8"))
             return data.get("requestId", "") or ""
@@ -397,9 +397,9 @@ def main():
     else:
         parser.print_help()
         print("\n示例:")
-        print("  meyo_skill_install.py hv-analysis --dir ~/.claude/skills --agent-type openclaw")
-        print("  meyo_skill_install.py hv-analysis --dir ~/.claude/skills --uninstall")
-        print("  meyo_skill_install.py --dir ~/.claude/skills --list")
+        print("  deep_skill_install.py hv-analysis --dir ~/.claude/skills --agent-type openclaw")
+        print("  deep_skill_install.py hv-analysis --dir ~/.claude/skills --uninstall")
+        print("  deep_skill_install.py --dir ~/.claude/skills --list")
 
 
 if __name__ == "__main__":

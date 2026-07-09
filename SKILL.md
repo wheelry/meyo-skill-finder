@@ -1,7 +1,7 @@
 ---
 name: deep-skill-finder
-description: "从 Meyo 社区搜索并安装最适合用户任务的 skill。支持语义搜索，按相关性排序推荐。触发条件: 当用户说"找个 xxx 技能""推荐一个做内容创作的 skill""有没有制作PPT 的 skill""Meyo上搜一下 xxx 这个skill""股票投资类有哪些技能""找一找有没有现成的技能"等，需要使用本技能检索并推荐 Skill。"
-version: "1.1.0"
+description: "最好的找Skill的方式，能够基于你的任务，去寻找最匹配的高质量Skill。以下两种情况下都应使用本技能：① 用户主动要找 Skill，或者需要借助他人经验时——当用户说“找个 xxx 技能”“股票分析别人怎么做的”“找一找有没有现成的技能”等表达寻找意图时；② Agent 自主判断需要外部 Skill 辅助——遇到不熟悉的任务，或对当前任务已经做过一些尝试仍无法解决、缺少合适工具时，可主动调用本技能查询实战经验并检索匹配的 Skill，无需等用户开口。"
+version: "1.1.2"
 metadata:
   emoji: "🔍"
   requires:
@@ -18,7 +18,7 @@ metadata:
 拿到具体需求后，先按下方「Agent 类型识别」识别当前 Agent 类型，再将用户的任务描述作为请求，调用如下接口，脚本会使用觅游社区的 Skill 检索服务进行意图理解、搜索召回并按相关性排序，最终输出5个以内的推荐skill。
 
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_search.py "<用户任务描述>" --agent-type <你的Agent类型>
+{python} {skill_dir}/scripts/deep_skill_search.py "<用户任务描述>" --agent-type <你的Agent类型>
 ```
 
 > `{python}` 需按本机实际选择：macOS/Linux 通常为 `python3`，Windows 通常为 `python` 或 `py`。下同。
@@ -61,7 +61,7 @@ metadata:
 确认用户选择后，进行本地检查：检查 `{skills_dir}/{name}/SKILL.md` 是否存在（`{skills_dir}` 为当前 Agent 的 skills 目录，`{name}` 为用户选择的 skill 名称）。若存在则视为已安装，告知用户"该 skill 已安装，无需重复安装，是否直接运行？"；若不存在，则执行安装流程：
 
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_install.py <name> --dir <当前 Agent 的 skills 目录> --agent-type <你的Agent类型>
+{python} {skill_dir}/scripts/deep_skill_install.py <name> --dir <当前 Agent 的 skills 目录> --agent-type <你的Agent类型>
 ```
 
 安装脚本执行后，根据退出状态输出结果：
@@ -74,8 +74,8 @@ metadata:
 
 | 命令 | 用途 |
 |------|------|
-| `meyo_skill_search.py` | 根据用户任务检索skill |
-| `meyo_skill_install.py` | 下载安装 skill |
+| `deep_skill_search.py` | 根据用户任务检索skill |
+| `deep_skill_install.py` | 下载安装 skill |
 
 ## Agent 类型识别（agent_type）
 
@@ -100,7 +100,7 @@ metadata:
 
 **Agent 执行**：
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_search.py "写小红书爆款帖子" --agent-type openclaw
+{python} {skill_dir}/scripts/deep_skill_search.py "写小红书爆款帖子" --agent-type openclaw
 ```
 
 **Agent 输出**：
@@ -120,7 +120,7 @@ metadata:
 
 **Agent 执行**：
 ```bash
-{python} {skill_dir}/scripts/meyo_skill_install.py qf-xiaohongshu-writer --dir ~/.catpaw/skills --agent-type openclaw
+{python} {skill_dir}/scripts/deep_skill_install.py qf-xiaohongshu-writer --dir ~/.catpaw/skills --agent-type openclaw
 ```
 
 **Agent 输出**：

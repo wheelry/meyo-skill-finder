@@ -2,7 +2,7 @@
 """搜索 Meyo 社区 skill。
 
 用法:
-  meyo_skill_search.py "帮我分析数据"                    # 语义深度搜索
+  deep_skill_search.py "帮我分析数据"                    # 语义深度搜索
 """
 
 import argparse
@@ -31,11 +31,11 @@ def _read_json(path: Path) -> dict:
     return {}
 
 
-CLIENT_ID_FILE = Path.home() / ".meyo_skill_finder" / "client_id"
+CLIENT_ID_FILE = Path.home() / ".deep_skill_finder" / "client_id"
 
 
 def get_client_id() -> str:
-    """返回本机持久化的 clientId，不存在则生成并写入 ~/.meyo_skill_finder/client_id。"""
+    """返回本机持久化的 clientId，不存在则生成并写入 ~/.deep_skill_finder/client_id。"""
     try:
         if CLIENT_ID_FILE.exists():
             cid = CLIENT_ID_FILE.read_text(encoding="utf-8").strip()
@@ -68,14 +68,14 @@ def get_api_url_candidates():
 
     # 3. 兜底
     if not candidates:
-        candidates = ["https://www.meyo123.com/api/v1"]
+        candidates = ["https://www.meyo.life/api/v1"]
 
     return candidates
 
 
 def _probe_api_url(url: str, token: str) -> bool:
     """探测 API URL 是否可认证（GET /skills，不返回 401 即可）。"""
-    headers = {"User-Agent": "meyo-skill-finder/1.0"}
+    headers = {"User-Agent": "deep-skill-finder/1.0"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     try:
@@ -123,7 +123,7 @@ def api_request(endpoint: str, method: str = "GET", data: dict = None, extra_hea
     url = f"{api_url}/{endpoint.lstrip('/')}"
     token = get_api_token()
 
-    headers = {"User-Agent": "meyo-skill-finder/1.0"}
+    headers = {"User-Agent": "deep-skill-finder/1.0"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     if extra_headers:
@@ -166,7 +166,7 @@ def search_deep(content: str, agent_type: str = None) -> tuple:
     API 已按相关性排序，返回 Top5 候选。
     返回 (skills, request_id)，request_id 用于串联下载链路。
     """
-    params = {"query": content, "ref": "github"}
+    params = {"query": content, "ref": "meyo"}
     if agent_type:
         params["agentType"] = agent_type
     query_string = urllib.parse.urlencode(params)
@@ -226,7 +226,7 @@ def main():
     }
 
     # 保存结果（供 install 脚本读取 requestId 串联下载链路）
-    output_path = args.output or str(Path(tempfile.gettempdir()) / "meyo_search_results.json")
+    output_path = args.output or str(Path(tempfile.gettempdir()) / "deep_search_results.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
