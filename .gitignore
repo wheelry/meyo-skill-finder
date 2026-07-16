@@ -6,3 +6,6 @@ __pycache__/
 # Claude Code / OMC 运行产物
 .omc/
 .claude/
+
+.idea/
+

@@ -1,117 +1,143 @@
+<div align="center">
+
 # Deep Skill Finder
 
-> 一键直达：[deep-skill-finder](https://www.meyo.life/skill)
+![deep-skill-finder](assets/background.png)
 
-**别让 Agent 在 Skill 市场里碰运气。**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.x-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/platform-ClaudeCode%20%7C%20Hermes%20%7C%20OpenClaw%20%7C%20CatClaw%20%7C%20MeyoAgent-8A2BE2.svg)](https://www.meyo.life)
 
-[deep-skill-finder](https://www.meyo.life/skill) 不看 Skill 怎么自述，只看它在真实任务里怎么跑。通过社区百万技能实测贴、横向对比和多路召回机制，把 Agent 的当前需求匹配到经战绩验证的 Skill。
+English | [中文](README.zh.md)
 
-一句话：告诉 Agent 你想做什么，它从 [Meyo 社区](https://www.meyo.life) 50000+ Skill 里找到最合适的，确认后一键安装。
+</div>
 
-![deep-skill-finder](assets/hero.png)
+---
 
-## Why it exists
 
-Skill 市场有两个问题：**想找的找不到，找到的不敢用。**
+## What is this?
+> Deep-skill-finder search powered by real execution and validation, not just follow creator claims
 
-创作者为了覆盖更多搜索，把描述写得宽泛抽象，真实任务进来时关键词对不上，真正适配的 Skill 被埋在大量候选里。而下载量、星标和文档评分不能证明它真的跑通过，边界、依赖、结果质量都不透明。
-
-deep-skill-finder 要解决的就是**发现**和**信任**两件事。
-
-![Skill 市场的问题](assets/why.png)
-
-## How it works
-
-Meyo 社区积累了百万量级的真实用户实测数据——用户在真实任务中运行 Skill 并记录下结果。deep-skill-finder 基于这些数据，用 AI Search 把 Agent 的自然语言需求匹配到经过实战验证的 Skill 上。
-
-```
-你描述一个真实任务
-       |
-       v
-deep-skill-finder 理解意图，改写为可检索 query
-       |
-       v
-多路召回：同时从 Skill 能力、社区实测贴、真实产出中检索
-       |
-       v
-按场景验证过的战绩排序，返回 TOP 5 推荐
-       |
-       v
-你选一个编号 → 自动安装，立即可用
-```
-
-核心能力链路分三步：全网 Skill 获取建立候选池，社区百万真实用户实测数据作为可检索的技能战绩，多路检索召回将需求匹配到可验证的结果上。
-
-![能力链路](assets/engine.png)
+deep-skill-finder crawls Skills across the web, builds an evaluable candidate pool, and uses multi-channel recall to precisely match the best-fit Skill for your current task. It distills millions of real community test records and Skill benchmark reports so you can identify verified, safe, and effective options before installing.
 
 ## Quick Start
 
-### Install
 
-```bash
-git clone https://github.com/wheelry/deep-skill-finder.git \
-  ~/.catpaw/skills/deep-skill-finder
+### Prerequisites
+- A running Agent 
+
+### Install deep-skill-finder in your Agent
+- Send the following prompt directly to your Agent to complete installation:
+
+```text
+Please install the deep-skill-finder skill: download the skill package from https://www.meyo.life/api/v1/skill-finder, extract it to the local skills directory, and enable it.
 ```
 
 ### Use
 
-用自然语言描述你的任务，deep-skill-finder 会理解意图并匹配：
+Talk to your Agent in natural language — no special syntax needed. When a task requires an external Skill, the Agent automatically triggers the search and installation flow. Examples:
 
 ```
-"找个能写公众号深度长文的 skill"
-"有没有拉龙虎榜数据的技能"
-"帮我搜一个生成 CI/CD 配置的 skill"
-"推荐一个英译中科普改写的技能"
+"Find me a skill that builds interactive dashboards from a CSV"
+"Is there a skill for pulling stock market data?"
+"Recommend a skill for translating technical docs into plain English"
+"I need to set up a CI/CD pipeline for my repo, find me a skill that writes GitHub Actions configs that actually run"
+"I'm building an AI product and need a business plan, find me a skill that helps structure the logic and polish the deck"
+"I want to batch-transcribe audio interviews into clean text, find me a skill that does this end to end"
 ```
 
-Agent 返回按相关性排序的推荐列表和推荐理由，选一个编号就帮你装好。
+The Agent returns a ranked list of up to 5 recommendations with reasons. Confirm a number and the installation completes automatically.
 
-![三步开始使用](assets/quickstart.png)
 
-## What makes it different
+## Why not just search the marketplace?
 
-**不靠 description，靠真实战绩。** 传统 Skill 搜索依赖创作者自己写的描述，deep-skill-finder 用社区真实运行结果来验证和排序。
+Standard marketplace search has two fundamental problems:
 
-**多路召回，不只关键词匹配。** 同时从 Skill 能力描述、社区实测贴和真实产出中召回，避免只靠单一信号漏掉最佳选项。
+1. **Discovery** — creators write broad, abstract descriptions to rank in more searches. When your specific task comes in, keyword matching buries the best match under noise.
 
-**暴露风险，降低误用。** 假脚本、依赖缺失、过度承诺这些问题会在实测中暴露出来，Agent 不用踩坑后才知道。
+2. **Trust** — download counts and star ratings can't tell you whether a Skill ever *actually ran correctly*. Broken dependencies, edge cases, and overpromising stay invisible until you're already in the pit.
 
-## Real-world examples
+deep-skill-finder addresses both: it recalls by actual task behavior, and ranks by real community run results — not by what a creator claims their Skill does.
 
-| 任务 | 其他 Finder | deep-skill-finder | 差异 |
-|------|------------|-------------------|------|
-| 写 GitHub Actions CI/CD 配置 | 推荐的 Skill 文档简略、脚本有 bug | 推荐文档详尽、执行顺畅的替代方案 | 别人漏掉的，精准召回 |
-| 拉取龙虎榜数据 | 推荐的 Skill 接口全挂 | 推荐专做龙虎榜的 Skill，3 次 API 调用全通 | 都能召回，只有我们跑得通 |
-| 英文技术博客翻译成中文科普文 | 只做翻译，未覆盖"科普化"需求 | 翻译+润色+术语保留三合一，175 秒一次通过 | 都能跑通，交付更优 |
 
-![实例对比](assets/comparison.png)
+## Highlights
 
-## Try it now
+**Web-wide Skill indexing** — crawls Skill content across the web and builds an evaluable candidate pool, independent of any single platform's popularity ranking.
 
-在线体验 deep-skill-finder：输入你的真实需求，调用 AI 语义搜索为你匹配 Skill。
+**Community-scale test records** — distills real tasks, run results, and benchmark reports from the community into a searchable Skill track-record database.
 
-[![在线体验](assets/try-and-cta.png)](https://www.meyo.life/skill)
+**Multi-channel recall** — pulls simultaneously from Skill capability descriptions, community test posts, and real outputs, preventing any single signal from missing the best candidate.
+
+**Autonomous workflow loop** — once installed, it runs persistently in your Agent and autonomously handles: identify need → multi-channel recall → confirm install → execute task → feed results back. Each match gets more accurate over time.
+
+**Intent-driven precision** — matches by understanding real task intent rather than description keywords, so specific needs surface the truly relevant Skill instead of being drowned out by generic descriptions.
+
+**Track-record-based ranking** — ranks candidates by real pass rate and output quality, so you don't have to guess between multiple seemingly viable Skills.
+
+**Risk exposure before install** — surfaces known failure points and boundary conditions accumulated from community testing, so you know which Skills have issues before committing, not after.
+
+
+## How it works
+
+```
+You describe a task in natural language
+            │
+            ▼
+     Intent understanding
+  (rewrite into semantic query)
+            │
+            ▼
+      Multi-channel recall
+  ┌─────────┬──────────────┐
+  │ Skill   │  Community   │
+  │ profile │  test posts  │
+  └────┬────┴──────┬───────┘
+       └─────┬─────┘
+             ▼
+  Rank by verified track record
+  → return TOP 5 with reasons
+             │
+             ▼
+  Confirm a number → auto-install
+```
+
 
 ## Project structure
 
 ```
-├── SKILL.md                        # Skill 定义文件（Agent 读取）
+├── SKILL.md                        # Skill definition (read by the Agent)
 └── scripts/
-    ├── deep_skill_search.py        # 语义搜索：调用 Meyo 检索服务
-    └── deep_skill_install.py       # 下载安装 Skill 到本地
+    ├── deep_skill_search.py        # Semantic search via Meyo retrieval service
+    └── deep_skill_install.py       # Download and install a Skill locally
 ```
 
-## Requirements
+## Scripts reference
 
-- Python 3.x
-- CatPaw
+You normally don't call these directly — the Agent handles invocation. But you can run them standalone:
 
-## Links
+**Search**
+```bash
+python3 scripts/deep_skill_search.py "your task description" [--agent-type openclaw]
+```
 
-- [了解 deep-skill-finder](https://www.meyo.life/skill)
-- [了解 Meyo 社区](https://www.meyo.life/community/home)
-- [去 Meyo 社区发现 Skill](https://www.meyo.life/community/square/skills)
+**Install / Uninstall / List**
+```bash
+# Install
+python3 scripts/deep_skill_install.py <skill-name> --dir ~/.catpaw/skills
+
+# Uninstall
+python3 scripts/deep_skill_install.py <skill-name> --dir ~/.catpaw/skills --uninstall
+
+# List installed
+python3 scripts/deep_skill_install.py --dir ~/.catpaw/skills --list
+```
+
+## Contributing
+
+Issues and pull requests are welcome.
+
+If you find that a specific Skill is ranked too high or too low, the underlying signal lives in the [Meyo community](https://www.meyo.life/community/home) — leaving a real test report there is the most direct way to improve future recommendations.
 
 ## License
 
-MIT
+Released under the [MIT License](LICENSE). Free to use, modify, and distribute — attribution appreciated.
