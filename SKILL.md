@@ -1,7 +1,7 @@
 ---
 name: deep-skill-finder
 description: "最好的找Skill的方式，能够基于你的任务，去寻找最匹配的高质量Skill。以下两种情况下都应使用本技能：① 用户主动要找 Skill，或者需要借助他人经验时——当用户说“找个 xxx 技能”“股票分析别人怎么做的”“找一找有没有现成的技能”等表达寻找意图时；② Agent 自主判断需要外部 Skill 辅助——遇到不熟悉的任务，或对当前任务已经做过一些尝试仍无法解决、缺少合适工具时，可主动调用本技能查询实战经验并检索匹配的 Skill，无需等用户开口。"
-version: "1.1.2"
+version: "1.2.4"
 metadata:
   emoji: "🔍"
   requires:
@@ -18,7 +18,7 @@ metadata:
 拿到具体需求后，先按下方「Agent 类型识别」识别当前 Agent 类型，再将用户的任务描述作为请求，调用如下接口，脚本会使用觅游社区的 Skill 检索服务进行意图理解、搜索召回并按相关性排序，最终输出5个以内的推荐skill。
 
 ```bash
-{python} {skill_dir}/scripts/deep_skill_search.py "<用户任务描述>" --agent-type <你的Agent类型>
+{python} {skill_dir}/scripts/deep_skill_search.py "<用户任务描述>" --agent-type <你的Agent类型，详见Agent 类型识别章节>
 ```
 
 > `{python}` 需按本机实际选择：macOS/Linux 通常为 `python3`，Windows 通常为 `python` 或 `py`。下同。
@@ -61,7 +61,7 @@ metadata:
 确认用户选择后，进行本地检查：检查 `{skills_dir}/{name}/SKILL.md` 是否存在（`{skills_dir}` 为当前 Agent 的 skills 目录，`{name}` 为用户选择的 skill 名称）。若存在则视为已安装，告知用户"该 skill 已安装，无需重复安装，是否直接运行？"；若不存在，则执行安装流程：
 
 ```bash
-{python} {skill_dir}/scripts/deep_skill_install.py <name> --dir <当前 Agent 的 skills 目录> --agent-type <你的Agent类型>
+{python} {skill_dir}/scripts/deep_skill_install.py <name> --dir <当前 Agent 的 skills 目录> --agent-type <你的Agent类型，详见Agent 类型识别章节>
 ```
 
 安装脚本执行后，根据退出状态输出结果：
@@ -79,13 +79,27 @@ metadata:
 
 ## Agent 类型识别（agent_type）
 
-为了得到更精准的搜索结果，调用搜索/下载脚本时需要上传当前 Agent 类型信息（`agent_type`）。请按以下方式识别你当前的 Agent 类型：
+为了得到更精准的搜索结果，调用搜索/下载脚本时需要上报当前 Agent 类型信息（`agent-type`）。请按以下方式识别：
 
-1. **从 system prompt 识别**：若你的运行环境提供 system prompt（如 Catdesk、Hermes 等），从中识别 Agent 框架名称
-2. **从 IDENTITY.md 识别**：若运行环境无 system prompt（如 Qclaw 等），检查本地是否存在 `IDENTITY.md`，从中读取 Agent 框架标识
-3. **自行判断**：若以上均无法识别，根据你所在的运行时框架自行判断
+1. **从环境变量识别（首选）**：检查是否存在 `<APP>_USER_DATA_DIR` 格式的环境变量，提取其路径末尾的目录名作为 Agent 类型
+   - QClaw / OpenClaw → `QCLAW_USER_DATA_DIR` → `QClaw`
+   - Hermes → `HERMES_DATA_DIR` → `Hermes`
+   - 其他 App 以此类推
 
-识别后，调用脚本时通过 `--agent-type <类型>` 参数传入。若确实无法识别，可省略该参数，脚本会正常执行但不带 agent_type 上报。
+2. **从 system prompt 识别**：若你的运行环境提供 system prompt（如 Catdesk、Hermes 等），从中识别 Agent 框架名称
+
+3. **从 IDENTITY.md 识别**：若以上均无法识别，检查本地 `IDENTITY.md` 是否存在并包含 `## 标识` 小节，从其中提取 App 名称
+
+4. **自行判断**：若以上均无法识别，根据你所在的运行时框架自行判断，可省略该参数，脚本会正常执行但不带 agent_type 上报
+
+## Skills 安装目录
+
+调用安装脚本时需要指定 `--dir` 参数为目标 Agent 的 skills 目录。确定方式：
+
+1. **从环境变量推导（首选）**：查 `<APP>_USER_DATA_DIR` 环境变量，在其路径下查找 `skills/` 子目录
+2. **从工作区查找**：检查当前工作区根目录下是否存在 `skills/` 子目录（含 SKILL.md 即为有效）
+3. **注意多目录情况**：部分 Agent 存在全局级和 workspace 级两个 skills 目录，发现多个候选时应询问用户选择安装到哪个目录
+4. **验证目录**：可用 `--list` 参数验证目录是否正确，返回已安装列表即说明路径有效
 
 ## 注意事项
 
@@ -120,7 +134,7 @@ metadata:
 
 **Agent 执行**：
 ```bash
-{python} {skill_dir}/scripts/deep_skill_install.py qf-xiaohongshu-writer --dir ~/.catpaw/skills --agent-type openclaw
+{python} {skill_dir}/scripts/deep_skill_install.py qf-xiaohongshu-writer --dir <当前 Agent 的 skills 目录> --agent-type <你的Agent类型，详见Agent 类型识别章节>
 ```
 
 **Agent 输出**：
