@@ -1,4 +1,4 @@
-#!/Users/zhibin/.pyenv/shims/python
+#!/usr/bin/env python3
 """从 Meyo 社区安装 Skill。
 
 用法:

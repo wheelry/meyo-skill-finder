@@ -1,4 +1,4 @@
-#!/Users/zhibin/.pyenv/shims/python
+#!/usr/bin/env python3
 """搜索 Meyo 社区 skill。
 
 用法:
